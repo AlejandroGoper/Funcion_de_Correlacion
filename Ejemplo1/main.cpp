@@ -1,12 +1,12 @@
-#include<stdio.h>
-#include<stdlib.h>
+//Aquí siempre se ponen las librerias del programa
+// estas son las librerias estandar que siempre tienes que poner, si o si.
+#include <stdio.h>
+#include <stdlib.h>
+
+// esta es la función principal.
 
 int main(){
-    float num;
-    printf("Hola mundo \n");
-    printf("Ingresa un número: \n");
-    scanf("%f",&num);
-    printf("El número tecleado es: %f \n", num);
+    printf("Hola, soy Alex \n");
     system("pause");
     return 0;
 }
