@@ -3,3 +3,9 @@
 
 #ignorar todos los ejecutables
 *.exe
+
+#ignorar archivo algo.txt
+algo.txt
+
+#aqui oculto la carpeta oculta
+/**/oculta/
