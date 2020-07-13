@@ -6,6 +6,7 @@ int main(){
     printf("Hola mundo \n");
     printf("Ingresa un número: \n");
     scanf("%f",&num);
+    printf("El número tecleado es: %f \n", num);
     system("pause");
     return 0;
 }
