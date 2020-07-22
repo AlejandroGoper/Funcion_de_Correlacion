@@ -9,3 +9,6 @@ algo.txt
 
 #aqui oculto la carpeta oculta
 /**/oculta/
+
+#aqui oculto todos los .dat
+*.dat
