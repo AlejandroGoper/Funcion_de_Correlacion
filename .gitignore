@@ -4,11 +4,12 @@
 #ignorar todos los ejecutables
 *.exe
 
-#ignorar archivo algo.txt
-algo.txt
-
-#aqui oculto la carpeta oculta
-/**/oculta/
+#ignorar archivos .txt
+*.txt
 
 #aqui oculto todos los .dat
 *.dat
+
+#aqui oculto todas las imagenes
+*.jpeg
+*.png
