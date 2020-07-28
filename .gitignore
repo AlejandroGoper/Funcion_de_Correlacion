@@ -1,8 +1,9 @@
 #para ignorar archivos de la carpeta .vscode
 /**/.vscode/
 
-#ignorar todos los ejecutables
+#ignorar todos los ejecutables windows y linux
 *.exe
+*ejecutable
 
 #ignorar archivos .txt
 *.txt
