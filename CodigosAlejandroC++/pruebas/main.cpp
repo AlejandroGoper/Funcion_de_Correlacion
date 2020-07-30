@@ -1,6 +1,6 @@
 #include <iostream> // estandar de entrada y salida
 #include <fstream> // manejo de archivos
-#include <string.h>
+//#include <string.h>
 #include "iso2PCF.h" // incluyo mi archivo de cabecera y clase
 
 using namespace std;
@@ -10,6 +10,7 @@ void abrir_archivo(const char *,int, Punto *);
 void guardar_Histograma(const char *,int, float*);
 void crear_Histogramas(int dim);
 void eliminar_Histogramas();
+void eliminar_Datos();
 
 //plantillas de funciones (genericas)
 
@@ -53,28 +54,22 @@ int main(int argc, char **argv){
     //int N = stoi(argv[3]), nb = stoi(argv[4]), d_max = stoi(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
     datosD = new Punto[N]; // creacion de N struct de puntos
     datosR = new Punto[N];
-    crear_Histogramas(nb);
-    for (int i = 0; i < nb; i++)
-    {
-        cout << *(DD+i) << endl;
-    }
-    
-    
-    /*
+    crear_Histogramas(nb); // se crean arrays de nb elementos en DD, DR, RR
     abrir_archivo("/home/alejandrogoper/Documentos/RepoDePrueba/Prueba/CodigosAlejandroC++/pruebas/data_500.dat",N,datosD); // guardo los datos en los Struct
     abrir_archivo("/home/alejandrogoper/Documentos/RepoDePrueba/Prueba/CodigosAlejandroC++/pruebas/rand0_500.dat",N,datosR);
     iso2PCF obj(nb,N,d_max,datosD,datosR); // instancio la clase y la inicializo
     obj.histogramasPuros(DD,RR);
     obj.histogramasMixtos(DR);
     obj.~iso2PCF(); // destruyo objeto
-    eliminar_array(datosR); // elimino los datos
-    eliminar_array(datosD);
+    eliminar_Datos(); // destruyo structs
     const char  *nombre1 = "DDiso500.dat";
     const char  *nombre2 = "DRiso500.dat";
     const char  *nombre3 = "RRiso500.dat";
     guardar_Histograma(nombre1, nb, DD);
     guardar_Histograma(nombre2, nb, DR);
-    guardar_Histograma(nombre3, nb, RR);*/
+    guardar_Histograma(nombre3, nb, RR);
+    eliminar_Histogramas();
+    cout << "listo" << endl;
     cin.get();
     return 0;
 }
@@ -108,7 +103,6 @@ void guardar_Histograma(const char *nombre,int dim, float*histograma){
         archivo << histograma[i] << endl;
     }
     archivo.close();
-    eliminar_array(histograma);
 }
 
 
@@ -128,4 +122,9 @@ void eliminar_Histogramas(){
     delete[] DD;
     delete[] DR;
     delete[] RR;
+}
+
+void eliminar_Datos(){
+    delete[] datosD;
+    delete[] datosR;
 }

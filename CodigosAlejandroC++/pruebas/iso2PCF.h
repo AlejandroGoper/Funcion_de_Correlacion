@@ -16,13 +16,6 @@ TDG1 dist(TDG1 x, TDG1 y, TDG1 z){
     return sqrt(x*x + y*y + z*z);
 }
 
-
-template <typename TDG>
-void eliminar_array(TDG *vector){
-    delete[] vector;
-}
-
-
 // distancia aproximada método a min b max
 template <typename TDG1>
 TDG1 distancia(TDG1 x, TDG1 y){
@@ -85,6 +78,27 @@ class iso2PCF{
         }
         void setPuntos(int _NPuntos){
             num_puntos = _NPuntos;
+        }
+        int getBins(){
+            return num_bins;
+        }
+        int getNumPuntos(){
+            return num_puntos;
+        }
+        float getDMAX(){
+            return d_max;
+        }
+        void getDATA(){
+            for (int i = 0; i < num_puntos; i++)
+            {
+                printf("%f - %f - %f \n",data[i].x, data[i].y, data[i].z);
+            }
+        }
+        void getRAND(){
+            for (int i = 0; i < num_puntos; i++)
+            {
+                printf("%f - %f - %f \n",rand[i].x, rand[i].y, rand[i].z);
+            }
         }
         void histogramasPuros(float *DD, float *RR){
             int i,j, pos;
