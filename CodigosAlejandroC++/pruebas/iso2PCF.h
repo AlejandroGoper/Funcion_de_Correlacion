@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdlib.h> //funciona el new y delete
 
 //Structura que define un punto 3D
 struct Punto{
@@ -7,9 +8,25 @@ struct Punto{
     float z;
 };
 
-template <typename TDG1, typename TDG2>
-TDG1 distancia(TDG2 x, TDG2 y){
-    TDG2 min, max, aprox;
+//Plantillas de funciones
+
+// distancia euclidea
+template <typename TDG1>
+TDG1 dist(TDG1 x, TDG1 y, TDG1 z){
+    return sqrt(x*x + y*y + z*z);
+}
+
+
+template <typename TDG>
+void eliminar_array(TDG *vector){
+    delete[] vector;
+}
+
+
+// distancia aproximada método a min b max
+template <typename TDG1>
+TDG1 distancia(TDG1 x, TDG1 y){
+    TDG1 min, max, aprox;
     if (x < 0){
         x*=-1;
     }
@@ -27,22 +44,21 @@ TDG1 distancia(TDG2 x, TDG2 y){
     
     aprox = (max*1007) + (min*441);
     //condicion para ajuste y mejora de precisión
-    if (max < (min << 4)){ //equivalente a decir que si max < 16*min
+    if (max < (16*min)){ //equivalente a decir que si max < 16*min
         aprox -= max*40; // equivalente a aprox - 5*max/128
     }
     //se añade un 512 para un apropiado redondeo de las cifras
     // se divide entre 1024 con >> 5
-    return ((aprox+512) >> 10);
+    return ((aprox+512)/1024);
 }
 
 // clase 
-template <class TDG1, class TDG2>
 class iso2PCF{
     // Atributos
     private:
         int num_bins;
         int num_puntos;
-        TDG1 d_max;
+        float d_max;
         Punto *data;
         Punto *rand;
     // Métodos
@@ -55,26 +71,10 @@ class iso2PCF{
             data = _data;
             rand = _rand;
         }
-        //Sobrecarga del constructor
-        iso2PCF(Punto *_data, Punto *_rand){
-            num_bins = 1;
-            num_puntos = 1;
-            d_max = 1;
-            data = _data;
-            rand = _rand;
-        }
-        //Sobrecarga del constructor
-        iso2PCF(){
-            num_bins = 1;
-            num_puntos = 1;
-            d_max = 1;
-            data = NULL;
-            rand = NULL;
-        }
         void setBins(int _num_bins){
             num_bins =  _num_bins;
         }
-        void setDMAX(TDG1 _d_max){
+        void setDMAX(float _d_max){
             d_max = _d_max;
         }
         void setData(Punto *_data){
@@ -86,8 +86,8 @@ class iso2PCF{
         void setPuntos(int _NPuntos){
             num_puntos = _NPuntos;
         }
-        void histogramasPuros(TDG2 *DD, TDG2 *RR){
-            int i,j;
+        void histogramasPuros(float *DD, float *RR){
+            int i,j, pos;
             float dd, rr, s = num_bins/num_puntos, aux;
             for (i = 0; i < num_puntos-1; i++)
             {
@@ -99,32 +99,36 @@ class iso2PCF{
                     rr = distancia(aux, rand[i].z - rand[j].z);
                     if (dd < d_max)
                     {
-                        DD[int(dd*s)] += 1;
+                        pos = (int)(dd*s);
+                        DD[pos] += 1;
                     }
                     if (rr < d_max)
                     {
-                        RR[int(rr*s)] += 1;
-                    }
-                    
+                        pos = (int)(rr*s);
+                        RR[pos] += 1;
+                    }   
                 }
             }
             
         }
-        void histogramasMixtos(TDG2 *DR){
-            int i,j;
+        void histogramasMixtos(float *DR){
+            int i,j,pos;
             float dr, s = num_bins/num_puntos, aux;
             for (i = 0; i < num_puntos; i++)
             {
                 for (j = 0; j < num_puntos; j++)
                 {
-                    aux = distancia(data[i].x - data[j].x, data[i].y - data[j].y);
+                    aux = distancia(data[i].x - rand[j].x, data[i].y - rand[j].y);
                     dr = distancia(aux, data[i].z - rand[j].z);
                     if (dr < d_max)
                     {
-                        DR[int(dr*s)] += 1;
+                        pos = (int)(dr*s);
+                        DR[pos] += 1;
                     }
                 }
             }
         }
-        ~iso2PCF();
+        ~iso2PCF(){ // destructor
+
+        }
 };

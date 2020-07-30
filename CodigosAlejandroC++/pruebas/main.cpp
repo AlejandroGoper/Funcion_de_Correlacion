@@ -1,15 +1,18 @@
-#include <iostream>
-#include <stdlib.h>
-#include <fstream>
-#include "iso2PCF.h"
+#include <iostream> // estandar de entrada y salida
+#include <fstream> // manejo de archivos
+#include <string.h>
+#include "iso2PCF.h" // incluyo mi archivo de cabecera y clase
 
 using namespace std;
 
 // Prototipos de funciones
-void abrir_archivo(char *,int, Punto *);
-void guardar_Histograma(char *,int, float*);
+void abrir_archivo(const char *,int, Punto *);
+void guardar_Histograma(const char *,int, float*);
+void crear_Histogramas(int dim);
+void eliminar_Histogramas();
 
 //plantillas de funciones (genericas)
+
 /*
 template <typename TDG>
 void crear_matriz(int num_filas, int num_columnas, TDG **M){
@@ -34,22 +37,10 @@ void eliminar_matriz(int num_filas, int num_columnas, TDG **M){
     delete[] M;
 }
 */
-
-template <typename TDG>
-void crear_array(int num_elementos, TDG *vector){
-        vector = new TDG[num_elementos];
-        for (int i = 0; i < num_elementos; i++)
-        {
-            *(vector+i) = 0.0;
-        }
-}
-
-template <typename TDG>
-void eliminar_array(TDG *vector){
-    delete[] vector;
-}
-
-
+//Variables globales
+float *DD, *DR, *RR;
+Punto *datosD;
+Punto *datosR;
 
 // primer argumento del main es el nombre del archivo datos
 // segundo argumento del main es el nombre del archivo rand
@@ -57,32 +48,41 @@ void eliminar_array(TDG *vector){
 // cuarto argumento es el numero de bins
 // quinto argumento es la distancia maxima
 int main(int argc, char **argv){   
-    Punto *datosD;
-    Punto *datosR;
-    float *DD, *DR, *RR;
-    int N = stoi(argv[3]), nb = stoi(argv[4]), d_max = stoi(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
+    float d_max=180.0;
+    int N = 500, nb = 30; // numero de elementos y numero de bins
+    //int N = stoi(argv[3]), nb = stoi(argv[4]), d_max = stoi(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
     datosD = new Punto[N]; // creacion de N struct de puntos
     datosR = new Punto[N];
-    crear_array(nb,DD); // creacion de histogramas e inicializacion con 0.0
-    crear_array(nb,DR);
-    crear_array(nb,RR);
-    abrir_archivo(argv[1],N,datosD); // guardo los datos en los Struct
-    abrir_archivo(argv[2],N,datosR);
-    iso2PCF<int,float> obj(nb,N,d_max,datosD,datosR); 
+    crear_Histogramas(nb);
+    for (int i = 0; i < nb; i++)
+    {
+        cout << *(DD+i) << endl;
+    }
+    
+    
+    /*
+    abrir_archivo("/home/alejandrogoper/Documentos/RepoDePrueba/Prueba/CodigosAlejandroC++/pruebas/data_500.dat",N,datosD); // guardo los datos en los Struct
+    abrir_archivo("/home/alejandrogoper/Documentos/RepoDePrueba/Prueba/CodigosAlejandroC++/pruebas/rand0_500.dat",N,datosR);
+    iso2PCF obj(nb,N,d_max,datosD,datosR); // instancio la clase y la inicializo
     obj.histogramasPuros(DD,RR);
     obj.histogramasMixtos(DR);
-    eliminar_array(datosR);
+    obj.~iso2PCF(); // destruyo objeto
+    eliminar_array(datosR); // elimino los datos
     eliminar_array(datosD);
-    guardar_Histograma("DD_iso500.dat", nb, DD);
-    guardar_Histograma("DR_iso500.dat", nb, DR);
-    guardar_Histograma("RR_iso500.dat", nb, RR);
+    const char  *nombre1 = "DDiso500.dat";
+    const char  *nombre2 = "DRiso500.dat";
+    const char  *nombre3 = "RRiso500.dat";
+    guardar_Histograma(nombre1, nb, DD);
+    guardar_Histograma(nombre2, nb, DR);
+    guardar_Histograma(nombre3, nb, RR);*/
+    cin.get();
     return 0;
 }
 
 //toma los datos del archivo y los guarda en un arreglo de structuras.
-void abrir_archivo(char *nombre_archivo,int cantidad_puntos, Punto *datos){
+void abrir_archivo(const char *nombre_archivo,int cantidad_puntos, Punto *datos){
     ifstream archivo;
-    archivo.open(nombre_archivo, ios::in | ios::binary);
+    archivo.open(nombre_archivo, ios::in | ios::binary); //le indico al programa que se trata de un archivo binario con ios::binary
     if (archivo.fail()){
         cout << "Error al cargar el archivo " << endl;
         exit(1);
@@ -96,7 +96,7 @@ void abrir_archivo(char *nombre_archivo,int cantidad_puntos, Punto *datos){
     archivo.close();
 }
 
-void guardar_Histograma(char *nombre,int dim, float*histograma){
+void guardar_Histograma(const char *nombre,int dim, float*histograma){
     ofstream archivo;
     archivo.open(nombre,ios::out | ios::binary);
     if (archivo.fail()){
@@ -109,4 +109,23 @@ void guardar_Histograma(char *nombre,int dim, float*histograma){
     }
     archivo.close();
     eliminar_array(histograma);
+}
+
+
+void crear_Histogramas(int dim){
+    DD = new float[dim];
+    DR = new float[dim];
+    RR = new float[dim];
+    for (int i = 0; i < dim; i++)
+    {
+        *(DD+i) = 0.0; // vector[i]
+        *(DR+i) = 0.0;
+        *(RR+i) = 0.0;
+    }
+}
+
+void eliminar_Histogramas(){
+    delete[] DD;
+    delete[] DR;
+    delete[] RR;
 }
