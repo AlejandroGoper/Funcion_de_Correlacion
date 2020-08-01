@@ -20,8 +20,7 @@ class iso3PCF{
         void setD_Max(float);
         void calcular_Histogramas_Puros(float ***, float ***);
         void calcular_Histogramas_Mixtos(float ***, float ***);
-        void simetrizar_Histograma_Puro(float ***);
-        void simetrizar_Histograma_Mixto(float ***);
+        void simetrizar_Histograma(float ***);
         iso3PCF(Puntos*, Puntos*, int, int, float);
         ~iso3PCF();
 };
@@ -119,14 +118,14 @@ void iso3PCF::calcular_Histogramas_Puros(float ***DDD, float ***RRR){
     }
 }
 
-void iso3PCF::simetrizar_Histograma_Puro(float ***DDD){
+void iso3PCF::simetrizar_Histograma(float ***DDD){
     int i,j,k;
     float valor;
-    for (i = 0; i < num_bins; i++)
+    for (i = 0; i < num_bins-2; i++)
     {
-        for (j = 0; j < num_bins; j++)
+        for (j = i + 1; j < num_bins-1; j++)
         {
-            for (k = 0; k < num_bins; k++)
+            for (k = j + 1; k < num_bins; k++)
             {
                 valor = DDD[i][j][k] + DDD[i][k][j] + DDD[j][k][i] + DDD[j][i][k] + DDD[k][i][j] + DDD[k][j][i];
                 DDD[i][k][j] = valor;
@@ -137,11 +136,6 @@ void iso3PCF::simetrizar_Histograma_Puro(float ***DDD){
             }   
         }
     }
-}
-
-void iso3PCF::simetrizar_Histograma_Mixto(float ***XXY){
-    int i,j,k;
-    float valor;
 }
 
 void iso3PCF::calcular_Histogramas_Mixtos(float ***DDR, float ***DRR){
