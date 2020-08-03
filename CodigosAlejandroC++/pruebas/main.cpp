@@ -11,6 +11,7 @@ void guardar_Histograma(string,int, float*);
 void crear_Histogramas(int dim);
 void eliminar_Histogramas();
 void eliminar_Datos();
+void agregar(Punto *&, int &, float,float,float);
 
 //Variables globales
 float *DD, *DR, *RR;
@@ -23,7 +24,7 @@ Punto *datosR;
 // cuarto argumento es el numero de bins
 // quinto argumento es la distancia maxima
 int main(int argc, char **argv){   
-    int N = stoi(argv[3]), nb = stoi(argv[4]), d_max = stof(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
+   /* int N = stoi(argv[3]), nb = stoi(argv[4]), d_max = stof(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
     datosD = new Punto[N]; // creacion de N struct de puntos
     datosR = new Punto[N];
     //Creo los nombres de los archivos
@@ -47,10 +48,36 @@ int main(int argc, char **argv){
     guardar_Histograma(nombre1, nb, DD);
     guardar_Histograma(nombre2, nb, DR);
     guardar_Histograma(nombre3, nb, RR);
-    eliminar_Histogramas();
+    eliminar_Histogramas();*/
+    Punto *array;
+    //float *array;
+    int c= 0;
+    array = new Punto[c];
+    agregar(array,c,1.0,2.0,3.0);
+    agregar(array,c,4.0,5.0,6.0);
+    for (int i = 0; i < c; i++)
+    {
+        cout << i << " --> " << array[i].x << "\t" << array[i].y << "\t" << array[i].z<< endl;
+    }
     cout << "listo" << endl;
-    cin.get();
     return 0;
+}
+
+void agregar(Punto* &array, int &logitud, float x, float y, float z){
+
+    logitud++;
+    Punto *array_aux = new Punto[logitud];
+    for (int i = 0; i < logitud-1; i++)
+    {
+        array_aux[i].x = array[i].x;
+        array_aux[i].y = array[i].y;
+        array_aux[i].z = array[i].z;
+    }
+    delete [] array;
+    array = array_aux;
+    array[logitud-1].x = x;
+    array[logitud-1].y = y;
+    array[logitud-1].z = z;
 }
 
 //toma los datos del archivo y los guarda en un arreglo de structuras.
