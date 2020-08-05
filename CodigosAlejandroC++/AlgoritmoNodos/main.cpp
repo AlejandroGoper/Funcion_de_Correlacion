@@ -7,15 +7,18 @@ using namespace std;
 
 Puntos *DATA,*RAND;
 Nodo **NODOSD;
+float *DD,*RR;
 
 void abrir_archivo(string,int, Puntos *);
 
 int main(int argc, char **argv){
-    int N_puntos = 20;
+    int N_puntos = 36;
     int N_particiones = 4;
-    int N_bins = 30;
-    float d_max = 180.0;
+    int N_bins = 4;
+    float d_max = 3;
     float caja_tam = 4.0;
+    DD = new float[N_bins];
+    RR = new float[N_bins];
     DATA = new Puntos[N_puntos];
     RAND = new Puntos[N_puntos];
     NODOSD = new Nodo*[N_particiones];
@@ -26,6 +29,13 @@ int main(int argc, char **argv){
     abrir_archivo("/home/alejandrogoper/Documentos/RepoDePrueba/Prueba/CodigosAlejandroC++/AlgoritmoNodos/datos_prueba.dat",N_puntos,DATA);
     NODE obj(DATA,RAND,NODOSD,caja_tam,d_max,N_particiones,N_bins,N_puntos);
     obj.mostrar_nodo();
+    obj.calcular_histogramas_puros(DD,RR);
+    printf("\n\n\n");
+    for (int i = 0; i < N_bins; i++)
+    {
+        printf("%d --> %f\n", i,DD[i]);
+    }
+    
 
     return 0;
 }

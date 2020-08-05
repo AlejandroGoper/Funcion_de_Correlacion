@@ -17,10 +17,11 @@ class NODE{
     private:
     void localizar_nodos(Nodo **, Puntos *);
     void agregar(Puntos *&, int &, float,float);
-    void asignar_puntos_al_nodo(Nodo**,Puntos *);
+    void calcular_distancias(Puntos *, int, Puntos*,int, float*, int);
     public:
     NODE(Puntos*, Puntos*,Nodo **,float,float,int,int,int);
     void mostrar_nodo();
+    void calcular_histogramas_puros(float *, float*);
     ~NODE();
 
 };
@@ -38,10 +39,111 @@ NODE::NODE(Puntos *_DATA, Puntos *_RAND, Nodo **_NODOD,float _dimension_caja, fl
     localizar_nodos(NODOSD, DATA);
 }
 
-//encuentra las posiciones de los nodos relativas a la dimension de la caja, inicializa arrays de elementos y el numero de elementos actuales 0.
+void NODE::calcular_distancias(Puntos *array1, int n1, Puntos *array2, int n2, float *XX, int incremento){
+
+    int i, j, pos;
+    float d,x1,x2,y1,y2;
+    float ds = ((float)(num_bins))/d_max;
+    for (i = 0; i < n1; i++)
+    {
+        x1 = array1[i].x;
+        y1 = array1[i].y;
+        for (j = 0; j < n2; j++)
+        {
+            x2 = array2[j].x;
+            y2 = array2[j].y;
+            d = euclidean_dist2D(x1-x2,y1-y2);
+            printf("%.2f\n",d);
+            if (d<d_max)
+            {
+                pos = (int)(d*ds);
+                XX[pos] += incremento;
+            }
+        }
+    }
+}
+
+void NODE::calcular_histogramas_puros(float *DD, float*RR){
+    //calcular por fuerza bruta las distancias entre los elementos de cada nodo
+    int fila, columna, i,j,pos;
+    float dd,rr, ds = ((float)(num_bins))/d_max;
+
+    for (fila = 0; fila < num_particiones; fila++)
+    {
+        for (columna = 0; columna < num_particiones; columna++)
+        {
+            printf("Distancias en el nodo N[%d][%d]: \n", fila, columna);
+            for (i = 0; i < NODOSD[fila][columna].num_elementos - 1; i++)
+            {
+                for (j = i+1; j < NODOSD[fila][columna].num_elementos; j++)
+                {
+                    //para DD
+                    dd = euclidean_dist2D(NODOSD[fila][columna].elementos[i].x-NODOSD[fila][columna].elementos[j].x,NODOSD[fila][columna].elementos[i].y-NODOSD[fila][columna].elementos[j].y);
+                    printf("%.2f\n",dd);
+                    if (dd < d_max)
+                    {
+                        pos = (int)(dd*ds);
+                        DD[pos] += 2;
+                    }
+                    
+                }
+            }
+            
+        }   
+    }
+    //calculamos por fuerza bruta las distancias entre cada nodo.
+    float x_p,y_p,x,y, d_entre_nodos,d_anterior;
+    int fila_piv, columna_piv;
+    for (fila_piv = 0; fila_piv < num_particiones; fila_piv++)
+    {
+        for (columna_piv = 0; columna_piv < num_particiones; columna_piv++)
+        {
+            x_p = NODOSD[fila_piv][columna_piv].coordenada.x;
+            y_p = NODOSD[fila_piv][columna_piv].coordenada.y;
+            for (fila = 0; fila < num_particiones; fila++)
+            {
+                for (columna = 0; columna < num_particiones; columna++)
+                {
+                    if ((fila_piv == fila)&&(columna_piv == columna))
+                    {
+
+                    }
+                    else
+                    {
+                        x = NODOSD[fila][columna].coordenada.x;
+                        y = NODOSD[fila][columna].coordenada.y;
+                        d_entre_nodos = euclidean_dist2D(x_p-x,y_p-y);
+                        printf("N[%d][%d]-N[%d][%d] = %.2f\n ",fila_piv,columna_piv,fila,columna,d_entre_nodos);
+                        if (d_entre_nodos < d_max)
+                        {
+                            d_anterior = d_entre_nodos;
+                            //calcular distancia entre puntos de los diferentes nodos
+                            calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);
+                        }
+                        else
+                        {   
+                            if (d_anterior < d_max)
+                            {
+                                //calcular distancia entre esos nodos
+                                calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);        
+                            }
+                            d_anterior = d_entre_nodos;
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    
+}
+
+//encuentra las posiciones de los nodos relativas a la dimension de la caja, inicializa arrays de elementos y el numero de elementos actuales es 0.
+//ademas asigna los datos a cada nodo
 void NODE::localizar_nodos(Nodo **nodos, Puntos *datos){
     int i, fila, columna;
     float inc = dimension_caja/((float)(num_particiones)), ds = 1.0/inc;
+    // creacion de nodos e inicializacion de valores y arrays de elementos
     for (fila = 0; fila < num_particiones; fila++)
     {
         for (columna = 0; columna < num_particiones; columna++)
@@ -52,7 +154,7 @@ void NODE::localizar_nodos(Nodo **nodos, Puntos *datos){
             nodos[fila][columna].elementos = new Puntos[0]; // todos los elementos son arreglos de dimension 0
         }
     }
-
+    //asignacion dinamica de puntos a cada nodo.
     for (i = 0; i < num_puntos; i++)
     {
         columna = (int)(datos[i].x*ds);
