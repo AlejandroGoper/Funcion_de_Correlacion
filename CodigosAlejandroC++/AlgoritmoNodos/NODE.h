@@ -116,18 +116,18 @@ void NODE::calcular_histogramas_puros(float *DD, float*RR){
                         printf("N[%d][%d]-N[%d][%d] = %.2f\n ",fila_piv,columna_piv,fila,columna,d_entre_nodos);
                         if (d_entre_nodos < d_max)
                         {
-                            d_anterior = d_entre_nodos;
+                            //d_anterior = d_entre_nodos;
                             //calcular distancia entre puntos de los diferentes nodos
                             calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);
                         }
                         else
                         {   
-                            if (d_anterior < d_max)
+                          /*  if (d_anterior < d_max)
                             {
                                 //calcular distancia entre esos nodos
                                 calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);        
                             }
-                            d_anterior = d_entre_nodos;
+                            d_anterior = d_entre_nodos;*/
                         }
                     }
                 }
