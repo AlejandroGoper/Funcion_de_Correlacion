@@ -84,29 +84,29 @@ void NODE::calcular_histogramas_puros(float *DD, float*RR){
                     {
                         pos = (int)(dd*ds);
                         DD[pos] += 2;
-                    }
-                    
+                    }       
                 }
-            }
-            
+            }        
         }   
     }
+
     //calculamos por fuerza bruta las distancias entre cada nodo.
     float x_p,y_p,x,y, d_entre_nodos,d_anterior;
-    int fila_piv, columna_piv;
+    int fila_piv, columna_piv,aux;
     for (fila_piv = 0; fila_piv < num_particiones; fila_piv++)
     {
         for (columna_piv = 0; columna_piv < num_particiones; columna_piv++)
         {
             x_p = NODOSD[fila_piv][columna_piv].coordenada.x;
             y_p = NODOSD[fila_piv][columna_piv].coordenada.y;
-            for (fila = 0; fila < num_particiones; fila++)
+            aux = columna_piv;
+            for (fila = fila_piv; fila < num_particiones; fila++)
             {
-                for (columna = 0; columna < num_particiones; columna++)
-                {
-                    if ((fila_piv == fila)&&(columna_piv == columna))
+                for (columna = aux; columna < num_particiones; columna++)
+                {   
+                    if ((fila_piv == fila)&&(columna_piv==columna))
                     {
-
+                    
                     }
                     else
                     {
@@ -131,6 +131,7 @@ void NODE::calcular_histogramas_puros(float *DD, float*RR){
                         }
                     }
                 }
+                aux = 0;
             }
 
         }

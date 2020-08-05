@@ -15,7 +15,7 @@ int main(int argc, char **argv){
     int N_puntos = 36;
     int N_particiones = 4;
     int N_bins = 4;
-    float d_max = 3;
+    float d_max = 2.5;
     float caja_tam = 4.0;
     DD = new float[N_bins];
     RR = new float[N_bins];
