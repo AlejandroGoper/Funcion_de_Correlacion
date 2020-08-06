@@ -99,36 +99,29 @@ void NODE::calcular_histogramas_puros(float *DD, float*RR){
         {
             x_p = NODOSD[fila_piv][columna_piv].coordenada.x;
             y_p = NODOSD[fila_piv][columna_piv].coordenada.y;
-            aux = columna_piv;
+            aux = columna_piv+1;
             for (fila = fila_piv; fila < num_particiones; fila++)
             {
                 for (columna = aux; columna < num_particiones; columna++)
                 {   
-                    if ((fila_piv == fila)&&(columna_piv==columna))
+                    x = NODOSD[fila][columna].coordenada.x;
+                    y = NODOSD[fila][columna].coordenada.y;
+                    d_entre_nodos = euclidean_dist2D(x_p-x,y_p-y);
+                    printf("N[%d][%d]-N[%d][%d] = %.2f\n ",fila_piv,columna_piv,fila,columna,d_entre_nodos);
+                    if (d_entre_nodos < d_max)
                     {
-                    
+                        d_anterior = d_entre_nodos;
+                        //calcular distancia entre puntos de los diferentes nodos
+                        calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);
                     }
                     else
-                    {
-                        x = NODOSD[fila][columna].coordenada.x;
-                        y = NODOSD[fila][columna].coordenada.y;
-                        d_entre_nodos = euclidean_dist2D(x_p-x,y_p-y);
-                        printf("N[%d][%d]-N[%d][%d] = %.2f\n ",fila_piv,columna_piv,fila,columna,d_entre_nodos);
-                        if (d_entre_nodos < d_max)
+                    {   
+                        if (d_anterior < d_max)
                         {
-                            //d_anterior = d_entre_nodos;
-                            //calcular distancia entre puntos de los diferentes nodos
-                            calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);
+                            //calcular distancia entre esos nodos
+                            calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);        
                         }
-                        else
-                        {   
-                          /*  if (d_anterior < d_max)
-                            {
-                                //calcular distancia entre esos nodos
-                                calcular_distancias(NODOSD[fila_piv][columna_piv].elementos,NODOSD[fila_piv][columna_piv].num_elementos,NODOSD[fila][columna].elementos,NODOSD[fila][columna].num_elementos,DD,2);        
-                            }
-                            d_anterior = d_entre_nodos;*/
-                        }
+                        d_anterior = d_entre_nodos;
                     }
                 }
                 aux = 0;

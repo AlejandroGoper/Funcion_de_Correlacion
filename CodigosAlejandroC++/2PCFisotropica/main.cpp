@@ -23,7 +23,8 @@ Punto *datosR;
 // cuarto argumento es el numero de bins
 // quinto argumento es la distancia maxima
 int main(int argc, char **argv){   
-    int N = stoi(argv[3]), nb = stoi(argv[4]), d_max = stof(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
+    int N = stoi(argv[3]), nb = stoi(argv[4]);
+    float d_max = stof(argv[5]); //cantidad de puntos N, numero de bins nb, d_max
     datosD = new Punto[N]; // creacion de N struct de puntos
     datosR = new Punto[N];
     //Creo los nombres de los archivos
@@ -34,7 +35,6 @@ int main(int argc, char **argv){
     nombre1 += ".dat";
     nombre2 += ".dat";
     nombre3 += ".dat";
-
     crear_Histogramas(nb); // se crean arrays de nb elementos en DD, DR, RR
     abrir_archivo(argv[1],N,datosD); // guardo los datos en los Struct
     abrir_archivo(argv[2],N,datosR);
@@ -43,7 +43,6 @@ int main(int argc, char **argv){
     obj.histogramasMixtos(DR);  // calculo los histogramas mixtos
     obj.~iso2PCF(); // destruyo objeto
     eliminar_Datos(); // destruyo structs
-
     guardar_Histograma(nombre1, nb, DD);
     guardar_Histograma(nombre2, nb, DR);
     guardar_Histograma(nombre3, nb, RR);

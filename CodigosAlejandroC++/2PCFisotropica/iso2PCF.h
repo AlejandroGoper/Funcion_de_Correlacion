@@ -54,19 +54,20 @@ class iso2PCF{
         void getDATA(){
             for (int i = 0; i < num_puntos; i++)
             {
-                printf("%f - %f - %f \n",data[i].x, data[i].y, data[i].z);
+                printf("%f - %f \n",data[i].x, data[i].y);//, data[i].z);
             }
         }
         void getRAND(){
             for (int i = 0; i < num_puntos; i++)
             {
-                printf("%f - %f - %f \n",rand[i].x, rand[i].y, rand[i].z);
+                printf("%f - %f \n",rand[i].x, rand[i].y);//, rand[i].z);
             }
         }
         void histogramasPuros(float *DD, float *RR){
             int i,j, pos;
-            float dd, rr, s, aux;
-            s = (float)(num_bins)/d_max;
+            float dd, rr, ds = (float)(num_bins), aux;
+            ds /= d_max;
+            printf("\n -- ds = %f -- \n", ds);
             for (i = 0; i < num_puntos-1; i++)
             {
                 for (j = i+1; j < num_puntos; j++)
@@ -80,19 +81,19 @@ class iso2PCF{
                     // Distancia euclidea
                     dd = dist(data[i].x-data[j].x, data[i].y - data[j].y, data[i].z - data[j].z);
                     rr = dist(rand[i].x-rand[j].x, rand[i].y - rand[j].y, rand[i].z - rand[j].z);
+
                     if (dd < d_max)
                     {
-                        pos = (int)(dd*s);
+                        pos = (int)(dd*ds);
                         DD[pos] += 2;
                     }
                     if (rr < d_max)
                     {
-                        pos = (int)(rr*s);
+                        pos = (int)(rr*ds);
                         RR[pos] += 2;
                     }   
                 }
             }
-            
         }
         void histogramasMixtos(float *DR){
             int i,j,pos;

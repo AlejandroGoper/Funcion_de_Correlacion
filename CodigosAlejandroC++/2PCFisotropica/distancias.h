@@ -5,6 +5,10 @@ template <typename TDG1>
 TDG1 dist(TDG1 x, TDG1 y, TDG1 z){
     return sqrt(x*x + y*y + z*z);
 }
+template <typename TDG>
+float euclidean_distance2D(TDG x, TDG y){
+    return sqrt(x*x + y*y);
+}
 
 // distancia aproximada método a min b max
 template <typename TDG>
