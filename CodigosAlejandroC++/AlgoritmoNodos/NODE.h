@@ -5,7 +5,8 @@
 class NODE{
     //Atributos
     private:
-    Nodo **NODOSD, **NODOSR;
+    Nodo **NODOSD;
+    Nodo **NODOSR;
     Puntos *DATA;
     Puntos *RAND;
     float dimension_caja;
@@ -39,6 +40,7 @@ NODE::NODE(Puntos *_DATA, Puntos *_RAND, Nodo **_NODOD, Nodo **_NODOR,float _dim
     num_bins = _num_bins;
     num_puntos = _num_puntos;
     localizar_nodos(NODOSD, DATA);
+    localizar_nodos(NODOSR, RAND);
 }
 //calcula la distancia entre dos arrays de puntos
 //util para calcular la distancia entre nodos diferentes
@@ -55,7 +57,6 @@ void NODE::calcular_distancias(Puntos *array1, int n1, Puntos *array2, int n2, f
             x2 = array2[j].x;
             y2 = array2[j].y;
             d = euclidean_dist2D(x1-x2,y1-y2);
-            printf("%.2f\n",d);
             if (d<d_max)
             {
                 pos = (int)(d*ds);
@@ -108,14 +109,12 @@ void NODE::distancias_entre_nodos_puros(Nodo** nodo,float*HH){
 
         }
     }
-    
 }
 
-void NODE::calcular_histogramas_puros(float *DD, float*RR){
+void NODE::calcular_histogramas_puros(float *DD, float *RR){
     //calcular por fuerza bruta las distancias entre los elementos de cada nodo
     int fila, columna, i,j,pos;
     float dd,rr, ds = ((float)(num_bins))/d_max;
-
     for (fila = 0; fila < num_particiones; fila++)
     {
         for (columna = 0; columna < num_particiones; columna++)
@@ -141,7 +140,7 @@ void NODE::calcular_histogramas_puros(float *DD, float*RR){
             }        
         }   
     }
-
+ 
     distancias_entre_nodos_puros(NODOSD,DD);
     distancias_entre_nodos_puros(NODOSR,RR);
     
@@ -223,7 +222,7 @@ void NODE::mostrar_nodo(){
     {
         for ( j = 0; j < num_particiones; j++)
         {
-            printf("Nodo [%d,%d] = (%.2f,%2f)\nTiene %d elementos: \n",i,j,NODOSD[i][j].coordenada.x, NODOSD[i][j].coordenada.y, NODOSD[i][j].num_elementos);
+            printf("NodoD [%d,%d] = (%.2f,%2f)\nTiene %d elementos: \n",i,j,NODOSD[i][j].coordenada.x, NODOSD[i][j].coordenada.y, NODOSD[i][j].num_elementos);
             for (c = 0; c < NODOSD[i][j].num_elementos; c++)
             {
                 printf("punto: (%f, %f) \n",NODOSD[i][j].elementos[c].x, NODOSD[i][j].elementos[c].y);
@@ -232,6 +231,21 @@ void NODE::mostrar_nodo(){
         }
         
     }
+    printf("\n\n\n\n");
+    for(i = 0; i < num_particiones; i++)
+    {
+        for ( j = 0; j < num_particiones; j++)
+        {
+            printf("NodoR [%d,%d] = (%.2f,%2f)\nTiene %d elementos: \n",i,j,NODOSR[i][j].coordenada.x, NODOSR[i][j].coordenada.y, NODOSR[i][j].num_elementos);
+            for (c = 0; c < NODOSR[i][j].num_elementos; c++)
+            {
+                printf("punto: (%f, %f) \n",NODOSR[i][j].elementos[c].x, NODOSR[i][j].elementos[c].y);
+            }
+            
+        }
+        
+    }
+    
 
 }
 

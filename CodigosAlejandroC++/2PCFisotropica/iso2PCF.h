@@ -5,7 +5,7 @@
 struct Punto{
     float x;
     float y;
-    float z;
+   // float z;
 };
 
 // clase 
@@ -79,9 +79,12 @@ class iso2PCF{
                     //rr = distancia(aux, rand[i].z - rand[j].z);
 
                     // Distancia euclidea
-                    dd = dist(data[i].x-data[j].x, data[i].y - data[j].y, data[i].z - data[j].z);
-                    rr = dist(rand[i].x-rand[j].x, rand[i].y - rand[j].y, rand[i].z - rand[j].z);
+                    //dd = dist(data[i].x-data[j].x, data[i].y - data[j].y, data[i].z - data[j].z);
+                    //rr = dist(rand[i].x-rand[j].x, rand[i].y - rand[j].y, rand[i].z - rand[j].z);
 
+                    //2D
+                    dd = euclidean_distance2D(data[i].x - data[j].x, data[i].y - data[j].y);
+                    rr = euclidean_distance2D(rand[i].x - rand[j].x, rand[i].y - rand[j].y);
                     if (dd < d_max)
                     {
                         pos = (int)(dd*ds);
@@ -108,7 +111,10 @@ class iso2PCF{
                     //dr = distancia(aux, data[i].z - rand[j].z);
 
                     // Distancia euclidea
-                    dr = dist(data[i].x - rand[j].x, data[i].y - rand[j].y, data[i].z - rand[j].z);
+                   // dr = dist(data[i].x - rand[j].x, data[i].y - rand[j].y, data[i].z - rand[j].z);
+
+                   //2D
+                   dr = euclidean_distance2D(data[i].x - rand[j].x, data[i].y - rand[j].y);
                     if (dr < d_max)
                     {
                         pos = (int)(dr*s);

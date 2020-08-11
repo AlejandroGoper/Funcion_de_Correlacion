@@ -11,9 +11,10 @@ Nodo **NODOSD,**NODOSR;
 float *DD,*RR,*DR;
 
 void abrir_archivo(string,int, Puntos *);
-void contruir_nodos(int);
+void construir_nodos(int);
+void construir_histogramas(int);
 void guardar_Histograma(string,int, float*);
-void eliminar_datos();
+void eliminar_Datos();
 
 /* 
 
@@ -24,16 +25,16 @@ ARGUMENTOS DEL MAIN:
 4 - Numero para los nodos (int), si es 4 por ejemplo, habra 4x4 nodos
 5 - Tamaño de la caja (float)
 6 - Numero de bins para los histogramas (int)
-7 - Distancia máxima (float)
+7 - Distancia máxima (float) 
 
 */
 
 int main(int argc, char **argv){
     time_t to, tf;
     //construccion de nombres de archivos a exportar
-    string nombre1 = "DDiso_";
-    string nombre2 = "DRiso_";
-    string nombre3 = "RRiso_";
+    string nombre1 = "DDiso_2D";
+    string nombre2 = "DRiso_2D";
+    string nombre3 = "RRiso_2D";
     nombre1.append(argv[3]);
     nombre2.append(argv[3]);
     nombre3.append(argv[3]);
@@ -43,7 +44,7 @@ int main(int argc, char **argv){
     //asignando argumentos del main a variables 
     int N_puntos = stoi(argv[3]);
     int N_particiones = stoi(argv[4]);
-    float caja_tam = stof(argv[5]);
+    float dim_caja = stof(argv[5]);
     int N_bins = stoi(argv[6]);
     float d_max = stof(argv[7]);
     //CREANDO ARREGLOS DE DATOS
@@ -52,28 +53,40 @@ int main(int argc, char **argv){
     //Cargando los datos a sus respectivos STRUCT
     abrir_archivo(argv[1],N_puntos,DATA);
     abrir_archivo(argv[2],N_puntos,RAND);
-    //CREANDO HISTOGRAMAS 1D
-    DD = new float[N_bins];
-    RR = new float[N_bins];
+    //Creando Histogramas
+    construir_histogramas(N_bins); 
     //Creando nodos
-    contruir_nodos(N_particiones);
+    construir_nodos(N_particiones);
     //Instacia de la clase
-    NODE obj(DATA,RAND,NODOSD,NODOSR,caja_tam,d_max,N_particiones,N_bins,N_puntos);
+    NODE obj(DATA,RAND,NODOSD,NODOSR,dim_caja,d_max,N_particiones,N_bins,N_puntos);
     to = time(NULL);
     //calculo los histogramas
     obj.calcular_histogramas_puros(DD,RR);
     obj.calcular_histogramas_mixtos(DR);
     tf = time(NULL);
     obj.~NODE(); // destruyo objeto
-    eliminar_Datos(); // destruyo structs e histogramas
     guardar_Histograma(nombre1,N_bins,DD);
     guardar_Histograma(nombre2,N_bins,DR);
     guardar_Histograma(nombre3,N_bins,RR);
+    eliminar_Datos(); // destruyo structs e histogramas
     cout << "Terminado en: " << difftime(tf,to) << " segundos." << endl;
     return 0;
 }
 
-void contruir_nodos(int n){
+void construir_histogramas(int dim){
+    DD = new float[dim];
+    RR = new float[dim];
+    DR = new float[dim];
+    int i;
+    for (i = 0; i < dim; i++)
+    {
+        *(DD+i) = 0.0;
+        *(DR+i) = 0.0;
+        *(RR+i) = 0.0;
+    }
+}
+
+void construir_nodos(int n){
     NODOSD = new Nodo*[n];
     NODOSR = new Nodo*[n];
     for (int i = 0; i < n; i++)
