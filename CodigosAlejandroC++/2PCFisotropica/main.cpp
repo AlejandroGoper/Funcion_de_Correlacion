@@ -28,7 +28,7 @@ int main(int argc, char **argv){
     datosD = new Punto[N]; // creacion de N struct de puntos
     datosR = new Punto[N];
     //Creo los nombres de los archivos
-    string nombre1 = "DDiso_2D", nombre2 = "DRiso_2D", nombre3 = "RRiso_2D";
+    string nombre1 = "DDiso_pll", nombre2 = "DRiso_pll", nombre3 = "RRiso_pll";
     nombre1.append(argv[3]);
     nombre2.append(argv[3]);
     nombre3.append(argv[3]);
@@ -41,7 +41,7 @@ int main(int argc, char **argv){
     iso2PCF obj(nb,N,d_max,datosD,datosR); // instancio la clase y la inicializo
     obj.histogramasPuros(DD,RR); // calculo los histogramas puros
     obj.histogramasMixtos(DR);  // calculo los histogramas mixtos
-    obj.getDATA();
+    //obj.getDATA();
     obj.~iso2PCF(); // destruyo objeto
     eliminar_Datos(); // destruyo structs
     guardar_Histograma(nombre1, nb, DD);
@@ -65,7 +65,7 @@ void abrir_archivo(string nombre_archivo,int cantidad_puntos, Punto *datos){
     float eliminar2;
     while (!archivo.eof())
     {
-        archivo >> datos[c].x >> datos[c].y;// >> eliminar2 >> eliminar; // >> datos[c].z >> eliminar; 
+        archivo >> datos[c].x >> datos[c].y >> datos[c].z >> eliminar; 
         c++;
     }
     archivo.close();

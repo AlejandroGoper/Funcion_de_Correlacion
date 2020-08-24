@@ -2,115 +2,42 @@
 #include <unistd.h>
 #include <math.h>
 #include <omp.h>
+#include <chrono>
+
+float f(float);
 
 int main(void){ 
-  const int N = 10;
-  float a[N], b[N], c[N];
-  int i;
-
-  /* Initialize arrays a and b */
-  for (i = 0; i < N; i++) {
-    a[i] = i * 2.0;
-    b[i] = i * 3.0;
-  }
-
-  printf("Vector a \t Vector b \n");
-
-  for (i = 0; i < N; i++)
-  {
-    printf("%f \t %f \n",a[i],b[i]);
-  }
-
- /* Compute values of array c = a+b in parallel. */
-  #pragma omp parallel shared(a, b, c) private(i)
-  { 
-    #pragma omp for             
-    for (i = 0; i < N; i++){
-      c[i] = a[i] + b[i];
-    }
-  }
-
-  printf("Vector c \n");
-  for (i = 0; i < N; i++)
-  {
-    printf("%f\n",c[i]);
-  }
-  float s;
-  s=0;
-  for (i = 0; i < N; i++)
-  {
-    s+=a[i] + b[i];
-  }
-  printf("La suma de los elemenos de a y b: %f \n",s);
-  s=0;
-  // en paralelo
-  #pragma omp parallel shared(a,s) private(i)
-  {
-    float ls = 0; // privada por defecto, pues se declara dentro de la seccion de paralelizar
-    #pragma omp for
-      for (i = 0; i < N; i++)
-      {
-        ls = a[i];
-        #pragma omp critical  
-        s += ls;  
-      }
-  }
-  printf("La suma de los elemenos de a en paralelo: %f \n",s);
-
-// en paralelo
-  #pragma omp parallel shared(a,b,c,s) private(i)
-  {
-    #pragma omp for
-      for (i = 0; i < N; i++)
-      {
-        s = sqrt(b[i]-a[i]);
-        c[i] = s;
-        //#pragma omp critical  
-        //s += ls;  
-      }
-  }
-
-  printf("Vector c \n");
-  for (i = 0; i < N; i++)
-  {
-    printf("%f\n",c[i]);
-  }
-  //sin paralelizar
-  for (i = 0; i < N; i++)
-  {
-    s = sqrt(b[i]-a[i]);
-    c[i] = s;
-        //#pragma omp critical  
-        //s += ls;  
-  }
-  
-  printf("Vector c \n");
-  for (i = 0; i < N; i++)
-  {
-    printf("%f\n",c[i]);
-  }
-  i = 0;
-  int j = 0,k = 0;
-  printf("\tPrueba de compresion de ciclos dinamicos\n");
-    printf("Normal\n");
-    int n = 4;
-    for(i=0; i<n; i++) {
-        for(j=0; j<=i; j++) {
-            printf("(%d,%d)\n", i,j);
-        }
-    }
-    printf("\n");
-    printf("Comprimido\n");
-    for (int x = 0; x < n*(n+1)/2; x++)
+  int nsteps = 65000,i,samples,is;
+  double h = 1.0/((double)(nsteps)), x,x2,y,y2, quarterpi = 0.0,slope,hs,xs,ys;
+  auto start = std::chrono::steady_clock::now();
+  #pragma omp parallel for reduction(+:quarterpi) private(i,x,x2,y,y2,slope,samples,is,hs,xs,ys) schedule(guided)
+    for (i = 0; i < nsteps; i++)
     {
-      ++j;
-      if (j>i)
+      x = (double)(i)*h;
+      x2 = (double)(i+1)*h;
+      y = f(x);
+      y2 = f(x2);
+      slope = (y - y2)/h;
+      if (slope > 15)
       {
-        j = 0;
-        ++i;
+        slope = 15;
       }
-      printf("(%d,%d)\n", i,j);
+      samples = 1 + (int)slope;
+      for (is = 0; is < samples; is++)
+      {
+        hs = h/samples;
+        xs = x +(double)(is)*hs;
+        ys = f(xs);
+        quarterpi += hs*ys;
+      }
     }
-    
-
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> duration_seconds = end - start;
+  printf("pi/4 = %f \nTerminado en: %lf seg\n",quarterpi,duration_seconds.count());
+  return 0;
 }
+
+float f(float x){
+  return sqrt(1.0-x*x);
+}
+
