@@ -61,7 +61,7 @@ class NODE{
 		// Implementamos Método de mallas:
 		void make_histoXX(long int *, long int*);
 		void make_histoXY(long int*);
-		void make_BFA(long int *, int ,Node ***, Node ***,int,int,int,int,int,int);
+		void make_BFA(bool, long int *, int ,Node ***, Node ***,int,int,int,int,int,int);
 		~NODE();
 };
 
@@ -150,39 +150,10 @@ void NODE::make_histoXX(long int *DD, long int *RR){
 				float dx, dy, dz, dx_nod, dy_nod, dz_nod;
 				
 				// Histograma DD
-				make_BFA(DD,2,nodeD,nodeD,row,col,mom,row,col,mom);
-				/*
-				for ( i= 0; i < nodeD[row][col][mom].len - 1; i++){
-					for ( j = i+1; j < nodeD[row][col][mom].len; j++){
-						dx =  nodeD[row][col][mom].elements[i].x-nodeD[row][col][mom].elements[j].x;
-						dy =  nodeD[row][col][mom].elements[i].y-nodeD[row][col][mom].elements[j].y;
-						dz =  nodeD[row][col][mom].elements[i].z-nodeD[row][col][mom].elements[j].z;
-						dis = dx*dx + dy*dy + dz*dz;
-						//comparamos la distancia al cuadrado para ahorrar calculos
-						if (dis <= dd_max){
-							pos = (int)(sqrt(dis)*ds);
-							#pragma omp atomic
-							DD[pos] += 2;
-						}
-					}
-				}*/
+				make_BFA(true,DD,2,nodeD,nodeD,row,col,mom,row,col,mom);
 
 				// Histograma RR
-				make_BFA(RR,2,nodeR,nodeR,row,col,mom,row,col,mom);
-				/*
-				for ( i= 0; i < nodeR[row][col][mom].len - 1; i++){
-					for ( j = i+1; j < nodeR[row][col][mom].len; j++){	
-						dx = nodeR[row][col][mom].elements[i].x-nodeR[row][col][mom].elements[j].x;
-						dy = nodeR[row][col][mom].elements[i].y-nodeR[row][col][mom].elements[j].y;
-						dz = nodeR[row][col][mom].elements[i].z-nodeR[row][col][mom].elements[j].z;
-						dis = dx*dx + dy*dy + dz*dz;
-						if (dis <= dd_max){
-							pos = (int)(sqrt(dis)*ds);
-							#pragma omp atomic
-							RR[pos] += 2;
-						}
-					}
-				}*/
+				make_BFA(true,RR,2,nodeR,nodeR,row,col,mom,row,col,mom);
 
 				// Distancias entre puntos del diferente nodo:
 				//coordenadas del nodo pivote
@@ -203,44 +174,17 @@ void NODE::make_histoXX(long int *DD, long int *RR){
 
 					if (dis_nod < d_max){
 						//calculamos por fuerza bruta la distancia entre todos los puntos de los diferentes nodos.
-						make_BFA(DD,2,nodeD,nodeD,row,col,mom,row,col,w);
-						/*
-						for ( i = 0; i < nodeD[row][col][mom].len; i++){
-							for ( j = 0; j < nodeD[row][col][w].len; j++){
-								dx =  nodeD[row][col][mom].elements[i].x-nodeD[row][col][w].elements[j].x;
-								dy =  nodeD[row][col][mom].elements[i].y-nodeD[row][col][w].elements[j].y;
-								dz =  nodeD[row][col][mom].elements[i].z-nodeD[row][col][w].elements[j].z;
-								dis = dx*dx + dy*dy + dz*dz;
-								if (dis < dd_max){
-									pos = (int)(sqrt(dis)*ds);
-									#pragma omp atomic
-									DD[pos] += 2;
-								}
-							}
-						}*/
+						make_BFA(false,DD,2,nodeD,nodeD,row,col,mom,row,col,w);
 					}
 
 					dx_nod = x1R-nodeR[row][col][w].nodepos.x;
 					dy_nod = y1R-nodeR[row][col][w].nodepos.y;
 					dz_nod = z1R-nodeR[row][col][w].nodepos.z;
 					dis_nod = sqrt(dx_nod*dx_nod + dy_nod*dy_nod + dz_nod*dz_nod)-corr;
-					if (dis_nod < d_max){
+					if (dis_nod < d_max)
+					{
 						//calculamos por fuerza bruta la distancia entre todos los puntos de los diferentes nodos.
-						make_BFA(RR,2,nodeR,nodeR,row,col,mom,row,col,w);
-						/*
-						for ( i = 0; i < nodeR[row][col][mom].len; i++){
-							for ( j = 0; j < nodeR[row][col][w].len; j++){	
-								dx =  nodeR[row][col][mom].elements[i].x-nodeR[row][col][w].elements[j].x;
-								dy =  nodeR[row][col][mom].elements[i].y-nodeR[row][col][w].elements[j].y;
-								dz =  nodeR[row][col][mom].elements[i].z-nodeR[row][col][w].elements[j].z;
-								dis = dx*dx + dy*dy + dz*dz;
-								if (dis < dd_max){
-									pos = (int)(sqrt(dis)*ds);
-									#pragma omp atomic
-									RR[pos] += 2;
-								}
-							}
-						}*/
+						make_BFA(false,RR,2,nodeR,nodeR,row,col,mom,row,col,w);
 					}
 				}
 				//Aqui se calcula la distancia con todos los nodos con misma row y variando col y mom (pared de nodos)
@@ -250,23 +194,8 @@ void NODE::make_histoXX(long int *DD, long int *RR){
 						dy_nod = y1D-nodeD[row][v][w].nodepos.y;
 						dz_nod = z1D-nodeD[row][v][w].nodepos.z;
 						dis_nod = sqrt(dx_nod*dx_nod + dy_nod*dy_nod + dz_nod*dz_nod)-corr;
-
 						if (dis_nod < d_max){
-							make_BFA(DD,2,nodeD,nodeD,row,col,mom,row,v,w);
-							/*
-							for ( i = 0; i < nodeD[row][col][mom].len; i++){
-								for ( j = 0; j < nodeD[row][v][w].len; j++){	
-									dx =  nodeD[row][col][mom].elements[i].x-nodeD[row][v][w].elements[j].x;
-									dy =  nodeD[row][col][mom].elements[i].y-nodeD[row][v][w].elements[j].y;
-									dz =  nodeD[row][col][mom].elements[i].z-nodeD[row][v][w].elements[j].z;
-									dis = dx*dx + dy*dy + dz*dz;
-									if (dis < dd_max){
-										pos = (int)(sqrt(dis)*ds);
-										#pragma omp atomic
-										DD[pos] += 2;
-									}
-								}
-							}*/
+							make_BFA(false,DD,2,nodeD,nodeD,row,col,mom,row,v,w);
 						}
 
 						dx_nod = x1R-nodeR[row][v][w].nodepos.x;
@@ -274,24 +203,11 @@ void NODE::make_histoXX(long int *DD, long int *RR){
 						dz_nod = z1R-nodeR[row][v][w].nodepos.z;
 						dis_nod = sqrt(dx_nod*dx_nod + dy_nod*dy_nod + dz_nod*dz_nod)-corr;
 						if (dis_nod < d_max){
-							make_BFA(RR,2,nodeR,nodeR,row,col,mom,row,v,w);
-							/*
-							for ( i = 0; i < nodeR[row][col][mom].len; i++){
-								for ( j = 0; j < nodeR[row][v][w].len; j++){	
-									dx =  nodeR[row][col][mom].elements[i].x-nodeR[row][v][w].elements[j].x;
-									dy =  nodeR[row][col][mom].elements[i].y-nodeR[row][v][w].elements[j].y;
-									dz =  nodeR[row][col][mom].elements[i].z-nodeR[row][v][w].elements[j].z;
-									dis = dx*dx + dy*dy + dz*dz;
-									if (dis < dd_max){
-										pos = (int)(sqrt(dis)*ds);
-										#pragma omp atomic
-										RR[pos] += 2;
-									}
-								}
-							}*/
+							make_BFA(false,RR,2,nodeR,nodeR,row,col,mom,row,v,w);
 						}
 					}
 				}
+
 				// aqui se calculan distancias entre nodos que no pertenecen a los antes calculados
 				for ( u = row + 1; u < partitions; u++){
 					for ( v = 0; v < partitions; v++){
@@ -302,21 +218,7 @@ void NODE::make_histoXX(long int *DD, long int *RR){
 							dz_nod = z1D-nodeD[u][v][w].nodepos.z;
 							dis_nod = sqrt(dx_nod*dx_nod + dy_nod*dy_nod + dz_nod*dz_nod)-corr;
 							if (dis_nod < d_max){
-								make_BFA(DD,2,nodeD,nodeD,row,col,mom,u,v,w);
-								/*
-								for ( i = 0; i < nodeD[row][col][mom].len; i++){
-									for ( j = 0; j < nodeD[u][v][w].len; j++){	
-										dx =  nodeD[row][col][mom].elements[i].x-nodeD[u][v][w].elements[j].x;
-										dy =  nodeD[row][col][mom].elements[i].y-nodeD[u][v][w].elements[j].y;
-										dz =  nodeD[row][col][mom].elements[i].z-nodeD[u][v][w].elements[j].z;
-										dis = dx*dx + dy*dy + dz*dz;
-										if (dis < dd_max){
-											pos = (int)(sqrt(dis)*ds);
-											#pragma omp atomic
-											DD[pos] += 2;
-										}
-									}
-								}*/
+								make_BFA(false,DD,2,nodeD,nodeD,row,col,mom,u,v,w);
 							}	
 							// Histograma RR
 							dx_nod = x1R-nodeR[u][v][w].nodepos.x;
@@ -324,21 +226,7 @@ void NODE::make_histoXX(long int *DD, long int *RR){
 							dz_nod = z1R-nodeR[u][v][w].nodepos.z;
 							dis_nod = sqrt(dx_nod*dx_nod + dy_nod*dy_nod + dz_nod*dz_nod)-corr;
 							if (dis_nod < d_max){
-								make_BFA(RR,2,nodeR,nodeR,row,col,mom,u,v,w);
-								/*
-								for ( i = 0; i < nodeR[row][col][mom].len; i++){
-									for ( j = 0; j < nodeR[u][v][w].len; j++){	
-										dx =  nodeR[row][col][mom].elements[i].x-nodeR[u][v][w].elements[j].x;
-										dy =  nodeR[row][col][mom].elements[i].y-nodeR[u][v][w].elements[j].y;
-										dz =  nodeR[row][col][mom].elements[i].z-nodeR[u][v][w].elements[j].z;
-										dis = dx*dx + dy*dy + dz*dz;
-										if (dis < dd_max){
-											pos = (int)(sqrt(dis)*ds);
-											#pragma omp atomic
-											RR[pos] += 2;
-										}
-									}
-								}*/
+								make_BFA(false,RR,2,nodeR,nodeR,row,col,mom,u,v,w);
 							}	
 						}	
 					}
@@ -360,7 +248,7 @@ void NODE::make_histoXY(long int *DR){
 	*/
 	float corr = size_node*sqrt(3);
 	float dis, dis_nod;
-	float ds = ((float)(bn))/d_max, dd_max = d_max*d_max;;
+	float dd_max = d_max*d_max;;
 	std::cout << "-> Estoy haciendo histograma DR..." << std::endl;
 	
 	#pragma omp parallel num_threads(4) private(dis,dis_nod) shared(partitions,corr,ds,d_max,dd_max)
@@ -383,21 +271,7 @@ void NODE::make_histoXY(long int *DR){
 							dz_nod = nodeD[row][col][mom].nodepos.z-nodeR[u][v][w].nodepos.z;
 							dis_nod = sqrt(dx_nod*dx_nod + dy_nod*dy_nod + dz_nod*dz_nod)-corr;
 							if (dis_nod <= d_max){
-								make_BFA(DR,1,nodeD,nodeR,row,col,mom,u,v,w);
-								/*
-								for ( i = 0; i < nodeD[row][col][mom].len; i++){
-									for ( j = 0; j < nodeR[u][v][w].len; j++){	
-										dx =  nodeD[row][col][mom].elements[i].x-nodeR[u][v][w].elements[j].x;
-										dy =  nodeD[row][col][mom].elements[i].y-nodeR[u][v][w].elements[j].y;
-										dz =  nodeD[row][col][mom].elements[i].z-nodeR[u][v][w].elements[j].z;
-										dis = dx*dx + dy*dy + dz*dz;
-										if (dis < dd_max){
-											pos = (int)(sqrt(dis)*ds);
-											#pragma omp atomic
-											DR[pos] += 1;
-										}
-									}
-								}*/	
+								make_BFA(false,DR,1,nodeD,nodeR,row,col,mom,u,v,w);
 							}
 						}
 					}	
@@ -408,11 +282,15 @@ void NODE::make_histoXY(long int *DR){
 	}
 }
 
-void NODE::make_BFA(long int *Hist,int inc,Node ***node1, Node ***node2,int row, int col, int mom, int u, int v, int w){
-	int i,j,pos;
+// Funcion que calcula distancia entre pares de puntos de distintos nodos y los asigna un histograma.
+void NODE::make_BFA(bool same_node,long int *Hist,int inc,Node ***node1, Node ***node2,int row, int col, int mom, int u, int v, int w){
+	int i,j,pos, node_len = node1[row][col][mom].len;
 	float dx,dy,dz,dis, dd_max = d_max*d_max;
-	for (i = 0; i < node1[row][col][mom].len; i++){
-
+	if (same_node)
+	{
+		node_len = node1[row][col][mom].len - 1;
+	}
+	for (i = 0; i < node_len; i++){
 		for (j = 0; j < node2[u][v][w].len; j++){
 			dx = node1[row][col][mom].elements[i].x - node2[u][v][w].elements[j].x;
 			dy = node1[row][col][mom].elements[i].y - node2[u][v][w].elements[j].y;
@@ -429,7 +307,7 @@ void NODE::make_BFA(long int *Hist,int inc,Node ***node1, Node ***node2,int row,
 }
 
 //=================================================================== 
-
+//Destructor de la clase
 NODE::~NODE(){
 	
 }
