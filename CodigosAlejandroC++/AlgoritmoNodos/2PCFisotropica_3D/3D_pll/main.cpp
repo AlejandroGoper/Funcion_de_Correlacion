@@ -2,16 +2,15 @@
 #include <fstream>
 #include <string.h>
 #include <chrono>
-#include <omp.h>
 #include "NODE.h"
 
 using namespace std;
 
 void open_files(string, int, Point3D *);
-void save_histogram(string, int, unsigned int *);
+void save_histogram(string, int, long int *);
 
 Point3D *dataD, *dataR;
-unsigned int  *DD, *RR, *DR;
+long int  *DD, *RR, *DR;
 Node ***nodeD;
 Node ***nodeR;
 
@@ -38,7 +37,7 @@ int main(int argc, char **argv){
 	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
 	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" << endl;
 	// Nombre de los archivos 
-	string nameDD = "DDiso_mesh_3D_pll_", nameRR = "RRiso_mesh_3D_pll_", nameDR = "DRiso_mesh_3D_pll_";
+	string nameDD = "test_DDiso_mesh_3D_pll_", nameRR = "test_RRiso_mesh_3D_pll_", nameDR = "test_DRiso_mesh_3D_pll_";
 	nameDD.append(argv[3]);
 	nameRR.append(argv[3]);
 	nameDR.append(argv[3]);
@@ -47,9 +46,9 @@ int main(int argc, char **argv){
 	nameDR += ".dat";
 	
 	// inicializamos los histogramas
-	DD = new unsigned int[bn];
-	RR = new unsigned int[bn];
-	DR = new unsigned int[bn];
+	DD = new long int[bn];
+	RR = new long int[bn];
+	DR = new long int[bn];
 	int i;
 	for (i = 0; i < bn; i++){
 		*(DD+i) = 0.0; // vector[i]
@@ -78,40 +77,18 @@ int main(int argc, char **argv){
 	NODE my_hist(bn, n_pts, size_box, size_node, d_max, dataD, dataR, nodeD, nodeR);
 	
 	auto start = std::chrono::system_clock::now();
-	
 	my_hist.make_histoXX(DD, RR); //hace histogramas XX
-	my_hist.make_histoXY(DR); //hace historamas XY
-	my_hist.~NODE(); //destruimos objeto
-	
 	auto end = std::chrono::system_clock::now();
-	auto elapsed = std::chrono::duration_cast<std::chrono::seconds>((end - start)); //mostramos los segundos que corre el programa
-	printf("Time = %lld s\n", static_cast<long long int>(elapsed.count()));
+	std::chrono::duration<double> duration_seconds = (end - start); //mostramos los segundos que corre el programa
+	printf("Time XX = %lf s\n", duration_seconds.count());
+
+	auto start1 = std::chrono::system_clock::now();
+	my_hist.make_histoXY(DR); //hace historamas XY
+	auto end1 = std::chrono::system_clock::now();
+	std::chrono::duration<double> duration_seconds1 = (end1 - start1); //mostramos los segundos que corre el programa
+	printf("Time XY = %lf s\n", duration_seconds1.count());
 	
-	cout << "Termine de hacer todos los histogramas" << endl;
-	
-	// Mostramos los histogramas 
-	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
-	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" << endl;
-	cout << "HITOGRAMA DD:" << endl;
-	
-	for (i = 0; i<bn; i++){
-		printf("%d \t",DD[i]);
-	}
-	cout << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
-	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" << endl;
-	cout << "HITOGRAMA RR:" << endl;
-	for (i = 0; i<bn; i++){
-		printf("%d \t",RR[i]);
-	}
-	cout << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
-	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" << endl;
-	cout << "HITOGRAMA DR:" << endl;
-	for (i = 0; i<bn; i++){
-		printf("%d \t",DR[i]);
-	}
-	
-	cout << "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::" << endl;
-	cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" << endl;
+	my_hist.~NODE(); //destruimos objeto	
 	save_histogram(nameDD, bn, DD);
 	cout << "\nGuarde histograma DD..." << endl;
 	save_histogram(nameRR, bn, RR);
@@ -120,11 +97,9 @@ int main(int argc, char **argv){
 	cout << "\nGuarde histograma DR..." << endl;
 	
 	// Eliminamos los hitogramas 
-	//delete[] DD;
-	//delete[] DR;
-	//delete[] RR;
-	
-	printf("Time = %lld s\n", static_cast<long long int>(elapsed.count()));
+	delete[] DD;
+	delete[] DR;
+	delete[] RR;
 	cout << "Programa finalizado..." << endl;
 	cin.get();
 	return 0;
@@ -157,7 +132,7 @@ void open_files(string name_file, int pts, Point3D *datos){
 //====================================================================
 
 
-void save_histogram(string name, int bns, unsigned int *histo){
+void save_histogram(string name, int bns, long int *histo){
 	/* Función para guardar nuestros archivos de histogramas */
 	ofstream file2;
 	file2.open(name.c_str(), ios::out | ios::binary);
