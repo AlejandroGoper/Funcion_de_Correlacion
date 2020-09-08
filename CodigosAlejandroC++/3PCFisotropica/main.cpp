@@ -8,7 +8,7 @@ using namespace std;
 
 //Prototipos de funciones
 void abrir_archivo(string,int, Puntos *);
-void guardar_Histogramas(string, int, float ***);
+void guardar_Histogramas(string, int, unsigned int ***);
 void crear_Histogramas3D(int); // un solo parametro, pues son matrices cuadradas
 void eliminar_Histogramas3D(int);
 void eliminar_Datos();
@@ -16,7 +16,7 @@ void eliminar_Datos();
 
 //Variables globales
 Puntos *DATA, *RAND;
-float ***DDD, ***DDR, ***DRR, ***RRR;
+unsigned int ***DDD, ***DDR, ***DRR, ***RRR;
 
 // primer argumento del main es el nombre del archivo datos
 // segundo argumento del main es el nombre del archivo rand
@@ -29,7 +29,7 @@ int main(int argc, char **argv){
     DATA = new Puntos[N];
     RAND = new Puntos[N];
     //Creo los nombres de los archivos
-    string nombre1 = "DDDiso_", nombre2 = "DDRiso_", nombre3 = "DRRiso_", nombre4 = "RRRiso_";
+    string nombre1 = "test_DDDiso_", nombre2 = "DDRiso_", nombre3 = "DRRiso_", nombre4 = "RRRiso_";
     nombre1.append(argv[3]);
     nombre2.append(argv[3]);
     nombre3.append(argv[3]);
@@ -42,21 +42,52 @@ int main(int argc, char **argv){
     abrir_archivo(argv[1],N,DATA);
     abrir_archivo(argv[2],N,RAND);
     //Inicializo con 0 los histogramas
-    crear_Histogramas3D(nb);
+    crear_Histogramas3D(2);
     //programa principal
-    iso3PCF obj(DATA,RAND,N,nb,d_max); // instancio la clase
+  /*  iso3PCF obj(DATA,RAND,N,nb,d_max); // instancio la clase
     to = time(NULL);
     obj.calcular_Histogramas_Puros(DDD,RRR);
     obj.calcular_Histogramas_Mixtos(DDR,DRR);
-    tf = time(NULL);
-    obj.simetrizar_Histograma(DDD);
-    obj.~iso3PCF(); // destruyo el objeto
+    tf = time(NULL),
+
+    
+    //obj.simetrizar_Histograma(DDD);
+    obj.~iso3PCF(); // destruyo el objeto */
+
+    string nalgo = "Prueba.dat";
+    int c=1;
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            for (int k = 0; k < 2; k++)
+            {
+                DDD[i][j][k] = c++;
+            }
+            
+        }
+        
+    }
+    cout << "paso" << endl;
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            for (int k = 0; k < 2; k++)
+            {
+                cout << "[" << i << "]" << "[" << j << "]" <<"[" << k << "] = " << DDD[i][j][k] << endl;
+            }
+        }
+    }
+
+    //unsigned int ***nalgon = algo;
+    guardar_Histogramas(nalgo,2,DDD);
     eliminar_Datos(); // destruyo structs
-    guardar_Histogramas(nombre1,nb,DDD);
+    //guardar_Histogramas(nombre1,nb,DDD);
     //guardar_Histogramas(nombre2,nb,DDR);
     //guardar_Histogramas(nombre3,nb,DRR);
     //guardar_Histogramas(nombre4,nb,RRR);
-    eliminar_Histogramas3D(nb);
+   // eliminar_Histogramas3D(nb);
     cout << "Calculo realizado en: " << difftime(tf,to) << " seg"<< endl;
     return 0;
 }
@@ -79,10 +110,29 @@ void abrir_archivo(string nombre_archivo,int cantidad_puntos, Puntos *datos){
     archivo.close();
 }
 
-void guardar_Histogramas(string nombre, int dimension, float ***Matriz){
-    int i,j;
+void guardar_Histogramas(string nombre, int dimension, unsigned int ***Matriz){
+    int i,j,k,d = 0;
     //puntero a todo el array
-    float (*puntero_arreglo)[dimension][dimension*dimension] = reinterpret_cast<float(*)[dimension][dimension*dimension]>(Matriz);
+    //unsigned int (*puntero_arreglo)[0][dimension][dimension*dimension] = reinterpret_cast<unsigned int(*)[0][dimension][dimension*dimension]>(Matriz);
+    //unsigned int (*reshaped)[dimension][dimension*dimension][1] = (unsigned int (*)[dimension][dimension*dimension][1])Matriz;
+    
+    unsigned int **reshape = new unsigned int*[dimension];
+    for ( i = 0; i < dimension; i++)
+    {
+        *(reshape + i) = new unsigned int[dimension*dimension];
+    }
+    
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            for (k= 0; k < 2; k++)
+            {
+               reshape[i][dimension*j + k] = Matriz[i][j][k];
+            }
+        }
+    }
+
     ofstream archivo;
     archivo.open(nombre.c_str(),ios::out | ios::binary);
     if (archivo.fail()){
@@ -93,7 +143,7 @@ void guardar_Histogramas(string nombre, int dimension, float ***Matriz){
     {
         for ( j = 0; j < dimension*dimension; j++)
         {
-            archivo << (*puntero_arreglo)[i][j] << " "; 
+            archivo << reshape[i][j] << " "; 
         }
         archivo << endl;
     }
@@ -104,22 +154,22 @@ void guardar_Histogramas(string nombre, int dimension, float ***Matriz){
 void crear_Histogramas3D(int dimension){
     int i,j,k;
     //reservación dinamica de memoria para un array de dimensiones cubicas
-    DDD = new float**[dimension];
-    DDR = new float**[dimension];
-    DRR = new float**[dimension];
-    RRR = new float**[dimension];
+    DDD = new unsigned int**[dimension];
+    DDR = new unsigned int**[dimension];
+    DRR = new unsigned int**[dimension];
+    RRR = new unsigned int**[dimension];
     for (i = 0; i < dimension; i++)
     {
-        *(DDD + i) = new float*[dimension];
-        *(DDR + i) = new float*[dimension];
-        *(DRR + i) = new float*[dimension];
-        *(RRR + i) = new float*[dimension];
+        *(DDD + i) = new unsigned int*[dimension];
+        *(DDR + i) = new unsigned int*[dimension];
+        *(DRR + i) = new unsigned int*[dimension];
+        *(RRR + i) = new unsigned int*[dimension];
         for (j = 0; j < dimension; j++)
         {
-            *(*(DDD+i)+j) = new float[dimension];
-            *(*(DDR+i)+j) = new float[dimension];
-            *(*(DRR+i)+j) = new float[dimension];
-            *(*(RRR+i)+j) = new float[dimension];
+            *(*(DDD+i)+j) = new unsigned int[dimension];
+            *(*(DDR+i)+j) = new unsigned int[dimension];
+            *(*(DRR+i)+j) = new unsigned int[dimension];
+            *(*(RRR+i)+j) = new unsigned int[dimension];
         }
     }
     //inicializacion
@@ -129,10 +179,10 @@ void crear_Histogramas3D(int dimension){
         {
             for (k = 0; k < dimension; k++)
             {
-                *(*(*(DDD + i) + j) + k)= 0.0;
-                *(*(*(DDR + i) + j) + k)= 0.0;   
-                *(*(*(DRR + i) + j) + k)= 0.0;
-                *(*(*(RRR + i) + j) + k)= 0.0;
+                *(*(*(DDD + i) + j) + k)= 0;
+                *(*(*(DDR + i) + j) + k)= 0;   
+                *(*(*(DRR + i) + j) + k)= 0;
+                *(*(*(RRR + i) + j) + k)= 0;
             }
         } 
     }
