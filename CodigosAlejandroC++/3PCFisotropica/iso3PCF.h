@@ -10,17 +10,17 @@ class iso3PCF{
         float d_max;
     //Métodos
     private:
-        void XXX(int, int, Puntos*, float ***);
-        void XXY(int,int, Puntos*, Puntos*,float ***);
+        void XXX(int, int, Puntos*, unsigned int***);
+        void XXY(int,int, Puntos*, Puntos*,unsigned int***);
     public:
         void setData(Puntos*);
         void setRand(Puntos*);
         void setNum_Bins(int);
         void setNum_Puntos(int);
         void setD_Max(float);
-        void calcular_Histogramas_Puros(float ***, float ***);
-        void calcular_Histogramas_Mixtos(float ***, float ***);
-        void simetrizar_Histograma(float ***);
+        void calcular_Histogramas_Puros(unsigned int ***, unsigned int ***);
+        void calcular_Histogramas_Mixtos(unsigned int ***, unsigned int ***);
+        void simetrizar_Histograma(unsigned int ***);
         iso3PCF(Puntos*, Puntos*, int, int, float);
         ~iso3PCF();
 };
@@ -36,7 +36,7 @@ iso3PCF::iso3PCF(Puntos *_data, Puntos *_rand, int _num_datos, int _num_bins, fl
 iso3PCF::~iso3PCF(){
 }
 
-void iso3PCF::XXX(int i,int j,Puntos *p, float ***HHH){
+void iso3PCF::XXX(int i,int j,Puntos *p, unsigned int ***HHH){
     int k,a,b,c;
     float l1,l2,l3, ds = (float)(num_bins)/d_max;
     l1 = euclidean_dist3D(p[i].x - p[j].x, p[i].y - p[j].y, p[i].z - p[j].z);
@@ -53,14 +53,19 @@ void iso3PCF::XXX(int i,int j,Puntos *p, float ***HHH){
                     a = (int)(l1*ds);
                     b = (int)(l2*ds);
                     c = (int)(l3*ds);
-                    *(*(*(HHH + a) + b) +c) += 1;                        
+                    *(*(*(HHH + a) + b) +c) += 1;
+                    *(*(*(HHH + a) + c) +b) += 1;
+                    *(*(*(HHH + b) + a) +c) += 1;
+                    *(*(*(HHH + b) + c) +a) += 1;
+                    *(*(*(HHH + c) + b) +a) += 1;
+                    *(*(*(HHH + c) + a) +b) += 1;
                 }
             }
         }
     }
 }
 
-void iso3PCF::XXY(int i, int j, Puntos *p, Puntos *q, float ***HHH){
+void iso3PCF::XXY(int i, int j, Puntos *p, Puntos *q, unsigned int ***HHH){
     int k,a,b,c;
     float ds = (float)(num_bins)/d_max,l1,l2,l3, inc = 1.0/3.0;
     l1 = euclidean_dist3D(p[i].x - p[j].x, p[i].y - p[j].y, p[i].z - p[j].z);
@@ -104,7 +109,7 @@ void iso3PCF::setD_Max(float _d_max){
     d_max = _d_max;
 }
 
-void iso3PCF::calcular_Histogramas_Puros(float ***DDD, float ***RRR){
+void iso3PCF::calcular_Histogramas_Puros(unsigned int ***DDD, unsigned int ***RRR){
     int i,j;
     for (i = 0; i < num_puntos-2; i++)
     {
@@ -118,7 +123,7 @@ void iso3PCF::calcular_Histogramas_Puros(float ***DDD, float ***RRR){
     }
 }
 
-void iso3PCF::simetrizar_Histograma(float ***DDD){
+void iso3PCF::simetrizar_Histograma(unsigned int ***DDD){
     int i,j,k;
     float valor;
     for (i = 0; i < num_bins-2; i++)
@@ -138,7 +143,7 @@ void iso3PCF::simetrizar_Histograma(float ***DDD){
     }
 }
 
-void iso3PCF::calcular_Histogramas_Mixtos(float ***DDR, float ***DRR){
+void iso3PCF::calcular_Histogramas_Mixtos(unsigned int ***DDR, unsigned int ***DRR){
     int i,j;
     for (i = 0; i < num_puntos -1 ; i++)
     {
