@@ -61,13 +61,14 @@ int main(int argc, char **argv){
     NODE obj(DATA,RAND,NODOSD,NODOSR,dim_caja,d_max,N_particiones,N_bins,N_puntos);
     to = time(NULL);
     //calculo los histogramas
-    obj.calcular_histogramas_puros(DD,RR);
-    obj.calcular_histogramas_mixtos(DR);
+    obj.mostrar_nodo();
+    //obj.calcular_histogramas_puros(DD,RR);
+    //obj.calcular_histogramas_mixtos(DR);
     tf = time(NULL);
     obj.~NODE(); // destruyo objeto
-    guardar_Histograma(nombre1,N_bins,DD);
-    guardar_Histograma(nombre2,N_bins,DR);
-    guardar_Histograma(nombre3,N_bins,RR);
+    //guardar_Histograma(nombre1,N_bins,DD);
+    //guardar_Histograma(nombre2,N_bins,DR);
+    //guardar_Histograma(nombre3,N_bins,RR);
     eliminar_Datos(); // destruyo structs e histogramas
     printf("Terminado en: %.4f segundos.",difftime(tf,to));
     return 0;

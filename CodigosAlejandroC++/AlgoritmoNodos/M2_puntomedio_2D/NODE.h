@@ -17,6 +17,7 @@ class NODE{
     //Métodos
     private:
     void localizar_nodos(Nodo **, Puntos *);
+    void copiar_nodo(Nodo *&,int&, float,float,int, Puntos *); 
     void agregar(Puntos *&, int &, float,float);
     void calcular_distancias(Puntos *, int, Puntos*,int, float*, int);
     void distancias_entre_nodos_puros(Nodo**,float*);
@@ -214,42 +215,79 @@ void NODE::localizar_nodos(Nodo **nodos, Puntos *datos){
         agregar(nodos[fila][columna].elementos,nodos[fila][columna].num_elementos,datos[i].x, datos[i].y);
     }
 
+
 }
 //Destructor
 NODE::~NODE(){
 }
 
-void NODE::mostrar_nodo(){
-    int i,j,c;
-    for(i = 0; i < num_particiones; i++)
+void NODE::copiar_nodo(Nodo *&array, int &lon, float _xnodo,float _ynodo,int _lonnodo, Puntos *elementos_nodo){
+    lon++; //incrementamos la longitud del arreglo
+    Nodo *arreglo_aux = new Nodo[lon]; //se crea un arreglo auxiliar de lon+1 nodos
+    for (int i = 0; i < lon-1; i++)
     {
-        for ( j = 0; j < num_particiones; j++)
+        arreglo_aux[i].coordenada.x = array[i].coordenada.x;
+        arreglo_aux[i].coordenada.y = array[i].coordenada.y; //copiamos las coordenadas de todos los nodos anteriores al nuevo nodo 
+        arreglo_aux[i].num_elementos = array[i].num_elementos;
+        arreglo_aux[i].elementos = new Puntos[array[i].num_elementos];
+        for (int k = 0; k < arreglo_aux[i].num_elementos; k++)
         {
-            printf("NodoD [%d,%d] = (%.2f,%.2f)\nTiene %d elementos: \n",i,j,NODOSD[i][j].coordenada.x, NODOSD[i][j].coordenada.y, NODOSD[i][j].num_elementos);
-            for (c = 0; c < NODOSD[i][j].num_elementos; c++)
-            {
-                printf("punto: (%f, %f) \n",NODOSD[i][j].elementos[c].x, NODOSD[i][j].elementos[c].y);
-            }
-            
+            arreglo_aux[i].elementos[k].x = array[i].elementos[k].x;
+            arreglo_aux[i].elementos[k].y = array[i].elementos[k].y;
         }
-        
     }
-    printf("\n\n\n\n");
-    for(i = 0; i < num_particiones; i++)
+    delete[] array;
+    array = arreglo_aux;
+    array[lon-1].coordenada.x = _xnodo;
+    array[lon-1].coordenada.y = _ynodo;
+    array[lon-1].num_elementos = _lonnodo;
+    array[lon-1].elementos = new Puntos[_lonnodo];
+    for (int i = 0; i < _lonnodo; i++)
     {
-        for ( j = 0; j < num_particiones; j++)
-        {
-            printf("NodoR [%d,%d] = (%.2f,%2f)\nTiene %d elementos: \n",i,j,NODOSR[i][j].coordenada.x, NODOSR[i][j].coordenada.y, NODOSR[i][j].num_elementos);
-            for (c = 0; c < NODOSR[i][j].num_elementos; c++)
-            {
-                printf("punto: (%f, %f) \n",NODOSR[i][j].elementos[c].x, NODOSR[i][j].elementos[c].y);
-            }
-            
-        }
-        
+        array[lon-1].elementos[i].x = elementos_nodo[i].x;
+        array[lon-1].elementos[i].y = elementos_nodo[i].y;
     }
     
+}
+void NODE::mostrar_nodo(){
 
+    //queremos copiar los primeros 2 nodos.
+    int n=0;
+    Nodo *arreglo_de_nodos = new Nodo[0];
+
+    int i=0,j=0,c;
+  
+    printf("NodoD [%d,%d] = (%.2f,%.2f)\nTiene %d elementos: \n",i,j,NODOSD[i][j].coordenada.x, NODOSD[i][j].coordenada.y, NODOSD[i][j].num_elementos);
+    for (c = 0; c < NODOSD[i][j].num_elementos; c++)
+    {
+        printf("punto: (%f, %f) \n",NODOSD[i][j].elementos[c].x, NODOSD[i][j].elementos[c].y);
+    }
+
+    copiar_nodo(arreglo_de_nodos,n,NODOSD[i][j].coordenada.x,NODOSD[i][j].coordenada.y,NODOSD[i][j].num_elementos,NODOSD[i][j].elementos);
+
+    printf("\n\nNodoCopiado [%d,%d] = (%.2f,%.2f)\nTiene %d elementos: \n",i,j,arreglo_de_nodos[n-1].coordenada.x, arreglo_de_nodos[n-1].coordenada.y, arreglo_de_nodos[n-1].num_elementos);
+    for (c = 0; c < arreglo_de_nodos[n-1].num_elementos; c++)
+    {
+        printf("punto: (%f, %f) \n",arreglo_de_nodos[n-1].elementos[c].x, arreglo_de_nodos[n-1].elementos[c].y);
+    }
+
+    i = 1;
+    j = 2;
+    printf("NodoD [%d,%d] = (%.2f,%.2f)\nTiene %d elementos: \n",i,j,NODOSD[i][j].coordenada.x, NODOSD[i][j].coordenada.y, NODOSD[i][j].num_elementos);
+    for (c = 0; c < NODOSD[i][j].num_elementos; c++)
+    {
+        printf("punto: (%f, %f) \n",NODOSD[i][j].elementos[c].x, NODOSD[i][j].elementos[c].y);
+    }
+
+     copiar_nodo(arreglo_de_nodos,n,NODOSD[i][j].coordenada.x,NODOSD[i][j].coordenada.y,NODOSD[i][j].num_elementos,NODOSD[i][j].elementos);
+    
+    printf("\n\nNodoCopiado [%d,%d] = (%.2f,%.2f)\nTiene %d elementos: \n",i,j,arreglo_de_nodos[n-1].coordenada.x, arreglo_de_nodos[n-1].coordenada.y, arreglo_de_nodos[n-1].num_elementos);
+    for (c = 0; c < arreglo_de_nodos[n-1].num_elementos; c++)
+    {
+        printf("punto: (%f, %f) \n",arreglo_de_nodos[n-1].elementos[c].x, arreglo_de_nodos[n-1].elementos[c].y);
+    }
+
+    printf("\n");
 }
 
 // agrega un elemento al final del array de tipo puntos e incrementa su longitud en 1

@@ -8,6 +8,15 @@ struct Punto{
     float z;
 };
 
+struct Node
+{
+    Punto position;
+    int len;
+    Punto *elements;
+};
+
+
+
 //Plantillas de funciones
 
 // distancia euclidea
