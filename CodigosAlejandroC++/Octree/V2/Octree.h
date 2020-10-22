@@ -72,20 +72,24 @@ Octree::Octree(float lado_caja, Punto *DATA, Punto *RAND, float d_max, int num_b
     this->num_puntos = num_puntos;
     this->profundidad_max = profundidad_max;
     this->longitud_max = longitud_max;
+    cout << "filtro1" << endl;
     hijo = new Nodo[8]; //primeros 8 hijos
-    for (int i = FUL; i < BDL; i++)
+    cout << "filtro2" << endl;
+    for (int i = FUL; i <= BDL; i++)
     {
         hijo[i].longitud = 0;
         hijo[i].profundidad = 1;
         hijo[i].puntos = nullptr;
     }
+    cout << "filtro3" << endl;
     //medianas del cubo raiz
     asignar_puntos(DATA,hijo);
+    cout << "filtro4" << endl;
 }
 
 int Octree::hallar_posicion(Punto punto){
     int pos;
-    int x_medio = lado_caja/2, y_medio = x_medio, z_medio = x_medio;
+    float x_medio = lado_caja/2, y_medio = x_medio, z_medio = x_medio;
     //Decidiendo la posición del punto respecto a las esquinas del nodo
     if (punto.x <= x_medio)
     {
@@ -162,6 +166,7 @@ void Octree::asignar_puntos(Punto *datos, Nodo *hijo){
     for (int i = 0; i < num_puntos; i++)
     {
         pos = hallar_posicion(datos[i]);
+        printf("punto (%f,%f,%f) pos %d\n",datos[i].x,datos[i].y,datos[i].z,pos);
         agregar(hijo[pos].puntos,hijo[pos].longitud,datos[i]);
     }
 
