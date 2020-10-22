@@ -13,7 +13,6 @@ struct Punto
     Punto(float _x,float _y,float _z):x(_x),y(_y),z(_z){} 
 };
 
-
 /*                      Definición de la clase OCTREE
     ====================================================================== 
 */
@@ -32,10 +31,10 @@ class Octree
 {
 private:
     /*
-        Si punto = nullptr es un nodo interno
-        Si punto = (-1,-1,-1) el nodo esta vacío
+        Si puntos = NULL es un nodo interno
+        Si puntos = (-1,-1,-1) el nodo esta vacío
     */
-    Punto *punto;
+    Punto *puntos;
     //Con esto se mide la dimensión del nodo
     Punto *esquina_frente_arriba_izquierda, *esquina_atras_abajo_derecha;
     //Puntero de clases
@@ -71,9 +70,9 @@ void Octree::insertar(float x, float y, float z){
 
     //Búsqueda binaria para insertar el punto
 
-    float x_medio = (esquina_frente_arriba_izquierda->x + esquina_atras_abajo_derecha->x)/2;
-    float y_medio = (esquina_frente_arriba_izquierda->y + esquina_atras_abajo_derecha->y)/2;
-    float z_medio = (esquina_frente_arriba_izquierda->z + esquina_atras_abajo_derecha->z)/2;
+    int x_medio = (esquina_frente_arriba_izquierda->x + esquina_atras_abajo_derecha->x)/2;
+    int y_medio = (esquina_frente_arriba_izquierda->y + esquina_atras_abajo_derecha->y)/2;
+    int z_medio = (esquina_frente_arriba_izquierda->z + esquina_atras_abajo_derecha->z)/2;
 
     int pos = -1;
 
@@ -130,13 +129,13 @@ void Octree::insertar(float x, float y, float z){
         }
     }
     //Checamos si existe un nodo interno
-    if (hijos[pos]->punto == nullptr)
+    if (hijos[pos]->puntos == nullptr)
     {
         hijos[pos]->insertar(x,y,z);
         return;
     }
     //Checamos si hay un nodo vacío
-    if(hijos[pos]->punto->x == -1.0)
+    if(hijos[pos]->puntos->x == -1.0)
     {
         delete hijos[pos];
         hijos[pos] =  new Octree(x,y,z);
@@ -200,7 +199,7 @@ bool Octree::buscar(float x, float y, float z){
         z < esquina_frente_arriba_izquierda->z ||
         z > esquina_atras_abajo_derecha->z)
     {
-        return 0; // false
+        return 0; //  0-false, 1-true
     }
     
     //Busqueda binaria para cada dimensión
@@ -210,7 +209,8 @@ bool Octree::buscar(float x, float y, float z){
 
     int pos = -1;
 
-    //Decidiendo la posición del punto respecto a las esquinas del nodo
+    //Decidiendo la posición
+    // a donde moverse
     if (x <= x_medio)
     {
         if (y <= y_medio)
@@ -263,20 +263,20 @@ bool Octree::buscar(float x, float y, float z){
     }
 
     //Si existe un nodo interno
-    if (hijos[pos]->punto == nullptr)
+    if (hijos[pos]->puntos == nullptr)
     {
         return hijos[pos]->buscar(x,y,z);
     }
-    else if (hijos[pos]->punto->x == -1.0) // si se encuentra un nodo vacío
+    else if (hijos[pos]->puntos->x == -1.0) // si se encuentra un nodo vacío
     {
-        return 0;
+        return 0; //false
     }
     else
     {
         //Si se ha encontrado el nodo con el valor dado
-        if (x == hijos[pos]->punto->x && y == hijos[pos]->punto->y && z == hijos[pos]->punto->z)
+        if (x == hijos[pos]->puntos->x && y == hijos[pos]->puntos->y && z == hijos[pos]->puntos->z)
         {
-            return 1;
+            return 1; // verdadero
         }
     }
     return 0;    
@@ -284,16 +284,17 @@ bool Octree::buscar(float x, float y, float z){
 
 
 
-
+//Para nodos vacios
 Octree::Octree()
 {
     //Se inicializa con -1,-1,-1
-    punto = new Punto();
+    puntos = new Punto();
 }
 
+//Para nodo con punto
 Octree::Octree(float x, float y, float z){
     //Para declarar un nodo
-    punto = new Punto(x,y,z);    
+    puntos = new Punto(x,y,z);    
 }
 
 Octree::Octree(float x1, float y1, float z1, float x2, float y2, float z2){
@@ -304,14 +305,14 @@ Octree::Octree(float x1, float y1, float z1, float x2, float y2, float z2){
         return; //sale de la función
     }
     
-    punto = nullptr; // puntos = NULL
+    puntos = nullptr; // puntos = NULL
     esquina_frente_arriba_izquierda =  new Punto(x1,y1,z1);
     esquina_atras_abajo_derecha = new Punto(x2,y2,z2);
     hijos.assign(8,nullptr); // 8 hijos (Octree*) de valor null, es decir, cada elemento Octree* es un puntero nulo
     //Asignamos una clase Octree nula a todos los hijos, uno por cada esquina
     for (int i = Esquina_frente_arriba_izquierda; i <= Esquina_atras_abajo_izquierda ; i++)
     {
-        hijos[i] = new Octree();
+        hijos[i] = new Octree(); // declaramos 8 nodos internos vacios
     }
     
 }
